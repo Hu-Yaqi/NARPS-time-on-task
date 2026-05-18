@@ -2,7 +2,6 @@
 
 Reanalysis of the NARPS mixed gamble fMRI dataset ([OpenNeuro ds001734](https://openneuro.org/datasets/ds001734)) examining time-on-task effects on value computation during risky decision-making.
 
-
 ## Overview
 
 This project investigates how extended task performance alters both behavioral decision parameters and neural value signals. Using prospect theory modeling and fMRI analysis of 41 subjects performing 256 mixed gamble trials, we show that:
@@ -12,28 +11,18 @@ This project investigates how extended task performance alters both behavioral d
 3. **Upstream regions remain stable** — insula, dACC, and IFG maintain consistent loss coding while vmPFC degrades
 4. **Behavioral consequences are selective** — unfavorable (ambiguous) gambles are most affected; favorable gambles are not
 
+
 ## Repository Structure
 
-```
-narps-time-on-task/
-├── scripts/
-│   ├── behavioral/          # Prospect theory models, model comparison, fatigue analysis
-│   │   ├── 01_data_exploration.py
-│   │   ├── ...
-│   │   └── 20_cross_validation.py
-│   ├── fmri/                # GLMs, group analysis, trajectory extraction
-│   │   ├── 21_single_subject_glm.py
-│   │   ├── ...
-│   │   └── 37_per_run_connectivity.py
-│   └── figures/             # Publication figure generation
-│       ├── 29_behavioral_fatigue_figure.py
-│       ├── 31_publication_figures.py
-│       └── 32_pipeline_figure.py
-├── environment.yml          # Conda environment specification
-├── requirements.txt         # pip dependencies
-├── LICENSE
-└── README.md
-```
+    narps-time-on-task/
+    ├── scripts/
+    │   ├── behavioral/          # Prospect theory models, model comparison, fatigue analysis
+    │   ├── fmri/                # GLMs, group analysis, trajectory extraction
+    │   └── figures/             # Reserved for publication figure scripts
+    ├── environment.yml
+    ├── requirements.txt
+    ├── LICENSE
+    └── README.md
 
 ## Dataset
 
@@ -49,26 +38,30 @@ Raw data are not included in this repository. Download from OpenNeuro and place 
 
 ### Behavioral Analysis
 
-| Script(s) | Analysis | Key Finding |
-|-----------|----------|-------------|
-| 01–05 | Data exploration & cleaning | 108 usable subjects |
-| 09–13 | Hierarchical Bayesian prospect theory (PyMC) | 4-model comparison via WAIC, BIC, CV |
-| 14–18 | Run-wise MLE & time-on-task effects | λ: 1.168 → 1.299, *p* < .0001, *d* = 0.39 |
-| 19–20 | Response strength & cross-validation | Selective to unfavorable gambles (*d* = 0.67) |
+| Script | Analysis | Key Finding |
+|--------|----------|-------------|
+| 05 | Hierarchical Bayesian prospect theory (PyMC) | Population parameter estimation |
+| 11b | Run-wise MLE estimation | λ: 1.168 → 1.299, *p* < .0001, *d* = 0.54 |
+| 12b | Model comparison (WAIC, BIC) | M2 (loss aversion only) wins unanimously |
+| 14–15 | Matched fatigue analysis by EV bin | Selective to unfavorable gambles (*d* = 0.67) |
+| 16 | Response strength analysis | Weak → strong rejection shift |
+| 17 | Model comparison by half | M4 advantage shrinks in late half |
+| 20 | Leave-one-run-out cross-validation | M2 = M4 = 90.2% accuracy |
+| 33 | Behavioral sawtooth statistics | Between-run partial recovery |
 
 ### fMRI Analysis
 
-| Script(s) | Analysis | Key Finding |
-|-----------|----------|-------------|
+| Script | Analysis | Key Finding |
+|--------|----------|-------------|
 | 22–23 | First-level GLMs & group analysis | Loss > Gain (R IFG: 23,318 mm³) |
 | 24 | Early vs. late contrast | vmPFC loss sensitivity ↑, gain sensitivity ↓ |
-| 27 | Trial-level GLM (loss × trial interaction) | Gradual change in dmPFC/dACC |
 | 26 | Brain–behavior ROI correlation | Group-level parallel, individual-level decoupled |
+| 27 | Trial-level GLM (loss × trial interaction) | Gradual change in dmPFC/dACC |
 | 28, 30 | 8-bin gain/loss trajectories | vmPFC: both channels → zero (*p* < .01) |
-| 34 | Sawtooth analysis | Loss between-run partial recovery (*p* = .029) |
+| 34 | Neural sawtooth statistics | Loss between-run partial recovery (*p* = .029) |
 | 35 | Multi-ROI trajectories | Insula, dACC, IFG stable (all *p* > .16) |
-| 36 | Trial-level logistic regression | vmPFC vs. insula/dACC predictive shift |
-| 37 | Per-run context-dependent correlation | vmPFC–target connectivity over time |
+| 36 | Trial-level logistic regression | ROI × time interactions (null) |
+| 37 | Per-run context-dependent correlation | vmPFC–target connectivity (null, suggestive trend) |
 
 ## Notation
 
@@ -113,7 +106,7 @@ This repository currently contains **analysis code only**. Result files, figures
 
 If you use this code or build on these analyses, please cite:
 
-> [Author]. (2026). Losing More, Gaining Less: Behavioral and Neural Signatures of Shifting Valuation During Risky Choice. *Proceedings of the Cognitive Computational Neuroscience Conference*.
+> Hu, Y. (2026). Losing More, Gaining Less: Behavioral and Neural Signatures of Shifting Valuation During Risky Choice. *Proceedings of the Cognitive Computational Neuroscience Conference*.
 
 And the original NARPS dataset:
 
