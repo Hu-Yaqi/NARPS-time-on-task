@@ -1,19 +1,13 @@
 """
 34_neural_sawtooth_test.py
 ==========================
-Re-run the 8-bin GLM (gain+loss) but this time SAVE per-subject per-bin
-vmPFC values, then do individual-level sawtooth statistics.
+Individual-level neural sawtooth statistics. Re-runs the 8-bin GLM
+and saves per-subject per-bin vmPFC values for gain and loss.
+Tests linear trend, within-run change, between-run reset, and
+gap convergence at the individual level.
 
-Tests:
-1. Neural loss between-run reset (next run 1st - current run 2nd)
-2. Neural loss within-run change (2nd - 1st)
-3. Neural gain between-run reset
-4. Neural gain within-run change
-5. Gap (gain-loss) linear trend per subject
-6. Gap convergence: is the gap at bin 8 smaller than bin 1?
-
-运行方式：conda activate narps && python 34_neural_sawtooth_test.py
-预计耗时：约 3-4 小时
+Outputs:
+  - sawtooth_statistics/individual_bin_vmPFC.csv
 """
 
 import pandas as pd
@@ -94,11 +88,11 @@ successful = []
 t0 = time.time()
 
 for subj in subjects:
-    print(f"\n处理 {subj} ...", end=' ')
+    print(f"\nProcessing {subj} ...", end=' ')
     ts = time.time()
     fdir = os.path.join(fmriprep_base, subj, 'func')
     if not os.path.exists(fdir):
-        print("跳过"); continue
+        print("Skip"); continue
 
     try:
         imgs, evts, confs = [], [], []
@@ -134,12 +128,12 @@ for subj in subjects:
         print(f"✗ {e}")
 
 elapsed = time.time() - t0
-print(f"\n完成: {len(successful)} subjects, {elapsed/60:.1f} min")
+print(f"\nDone: {len(successful)} subjects, {elapsed/60:.1f} min")
 
 # Save individual data
 ind_df = pd.DataFrame(all_rows)
 ind_df.to_csv(os.path.join(output_dir, 'individual_bin_vmPFC.csv'), index=False)
-print(f"保存: {output_dir}/individual_bin_vmPFC.csv")
+print(f"Saved: {output_dir}/individual_bin_vmPFC.csv")
 
 # ============================================================
 # Statistical Tests

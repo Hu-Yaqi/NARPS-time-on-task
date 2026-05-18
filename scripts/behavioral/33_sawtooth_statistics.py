@@ -1,17 +1,12 @@
 """
 33_sawtooth_statistics.py
-=========================
-Individual-level statistical tests for:
-1. Gap convergence (gain - loss shrinks over time)
-2. Loss between-run recovery
-3. Loss within-run decline
-4. Gain between-run recovery (expected: absent)
-5. Gain within-run decline (expected: absent)
+========================
+Individual-level statistical tests for behavioral sawtooth patterns:
+rejection rate trend, within-run change, between-run reset,
+lambda slope, neural vmPFC change, and brain-behavior correlation.
 
-Uses individual subject data from script 30's GLM.
-
-运行方式：conda activate narps && python 33_sawtooth_statistics.py
-前提：30_gain_trajectory.py 已跑完
+Outputs:
+  - sawtooth_statistics/sawtooth_tests.csv
 """
 
 import pandas as pd
@@ -27,62 +22,38 @@ output_dir = 'sawtooth_statistics'
 os.makedirs(output_dir, exist_ok=True)
 
 # ============================================================
-# 读取每个被试的8-bin数据
 # ============================================================
 
-# 如果脚本30保存了per-subject数据，直接读取
-# 否则需要从z-map重新提取
 
-# 检查是否有per-subject数据
-# 脚本30没有保存individual data，只保存了group mean
-# 所以我们需要重新从nii.gz提取
 
 print("=" * 60)
 print("Individual-Level Sawtooth Statistics")
 print("=" * 60)
 
-# 方法：从binned GLM的z-map文件中提取
-# 但脚本28/30没有保存per-bin的z-map
-# 所以我们用另一个方法：从脚本28的output重新提取
 
-# 先检查binned GLM有没有保存individual z-maps
 binned_dir = 'gain_trajectory_results'
 
-# 实际上脚本30只保存了group csv，没有保存individual nii
-# 我们需要用行为数据 + neural data 的另一种方式
 
-# 更好的方法：从all_subjects_behavior.csv直接计算
-# 每个被试每个bin的rejection rate（行为侧）
-# 然后从runwise_parameters来间接检验
 
-# 但对于neural侧，我们需要per-subject per-bin的vmPFC值
-# 这些值在脚本30跑的时候计算过但没保存到文件
 
-# 解决方案：重新跑一次提取（不需要重跑GLM）
-# 不对，GLM结果没有保存per-bin contrast maps
 
-# 最实际的方案：用行为数据做sawtooth检验
-# 同时对neural侧做能做的检验
 
-print("\n--- 方案: 用行为数据做individual-level sawtooth检验 ---")
-print("--- 对neural侧用已有的early-vs-late individual maps ---\n")
+print("\n--- Using behavioral data for individual-level sawtooth tests ---")
+print("--- Neural side uses existing early/late difference maps ---\n")
 
 # ============================================================
-# 1. 行为侧：individual-level gap and sawtooth
 # ============================================================
 
 behavior = pd.read_csv('all_subjects_behavior.csv')
 
-# 找到有fMRI数据的被试
 fmriprep_base = 'data/derivatives/fmriprep'
 fmri_subjects = sorted([
     d for d in os.listdir(fmriprep_base)
     if d.startswith('sub-') and os.path.isdir(os.path.join(fmriprep_base, d))
 ])
 
-print(f"fMRI被试数: {len(fmri_subjects)}")
+print(f"fMRIN subjects: {len(fmri_subjects)}")
 
-# 对每个被试，计算8个bin的rejection rate
 all_subject_bins = []
 
 for subj in fmri_subjects:
@@ -116,7 +87,6 @@ pivot = bin_df.pivot(index='subject', columns='bin', values='reject_rate')
 print(f"Pivot shape: {pivot.shape}")  # should be 41 × 8
 
 # ============================================================
-# 2. Neural侧：individual-level using early vs late maps
 # ============================================================
 
 print("\n--- Neural: extracting individual vmPFC values from early/late maps ---")
@@ -127,7 +97,6 @@ masker = NiftiSpheresMasker(seeds=vmPFC_coords, radius=8, standardize=False)
 fatigue_dir = 'fatigue_neural_results'
 first_level_dir = 'first_level_results'
 
-# 从脚本24的输出读取individual difference maps
 neural_data = []
 for subj in fmri_subjects:
     loss_diff = os.path.join(fatigue_dir, f'{subj}_loss_late_minus_early.nii.gz')
@@ -275,4 +244,4 @@ results = {
     'p': [p_behav, p_within, p_reset, p_lam, p_neural, p_bb],
 }
 pd.DataFrame(results).to_csv(os.path.join(output_dir, 'sawtooth_tests.csv'), index=False)
-print(f"保存: {output_dir}/sawtooth_tests.csv")
+print(f"Saved: {output_dir}/sawtooth_tests.csv")

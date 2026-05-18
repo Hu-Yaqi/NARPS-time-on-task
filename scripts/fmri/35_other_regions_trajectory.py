@@ -1,20 +1,17 @@
 """
 35_other_regions_trajectory.py
 ==============================
-Same as script 34 but for additional ROIs:
-- Left insula (loss processing / salience)
-- dACC (conflict monitoring)  
-- Right insula
-- Left amygdala
-- Ventral striatum
+8-bin trajectory extraction for six additional ROIs (L/R insula,
+dACC, L amygdala, R IFG, ventral striatum). Tests whether these
+regions maintain stable loss coding while vmPFC degrades.
 
-Question: do these regions show INCREASING loss sensitivity 
-while vmPFC shows DECREASING loss sensitivity?
-If yes: balance shifts from precise valuation (vmPFC) to 
-crude threat/salience signaling (insula/dACC).
+Key result: all six regions show flat loss trajectories (p > .16),
+supporting selective vmPFC integration failure.
 
-运行方式：conda activate narps && python 35_other_regions_trajectory.py
-预计耗时：约 3-4 小时
+Outputs:
+  - other_regions_results/individual_bin_all_rois.csv
+  - other_regions_results/roi_loss_trends_summary.csv
+  - other_regions_results/all_rois_loss_trajectory.pdf
 """
 
 import pandas as pd
@@ -106,11 +103,11 @@ successful = []
 t0 = time.time()
 
 for subj in subjects:
-    print(f"处理 {subj} ...", end=' ')
+    print(f"Processing {subj} ...", end=' ')
     ts = time.time()
     fdir = os.path.join(fmriprep_base, subj, 'func')
     if not os.path.exists(fdir):
-        print("跳过"); continue
+        print("Skip"); continue
 
     try:
         imgs, evts, confs = [], [], []
@@ -149,7 +146,7 @@ for subj in subjects:
 
 elapsed = time.time() - t0
 n_subj = len(successful)
-print(f"\n完成: {n_subj} subjects, {elapsed/60:.1f} min")
+print(f"\nDone: {n_subj} subjects, {elapsed/60:.1f} min")
 
 ind_df = pd.DataFrame(all_rows)
 ind_df.to_csv(os.path.join(output_dir, 'individual_bin_all_rois.csv'), index=False)
@@ -216,7 +213,7 @@ summary_df.to_csv(os.path.join(output_dir, 'roi_loss_trends_summary.csv'), index
 # Visualization: all ROIs on one figure
 # ============================================================
 
-print(f"\n生成可视化...")
+print(f"\nGenerating figures...")
 
 plt.rcParams.update({
     'font.family': 'serif',
@@ -270,7 +267,7 @@ fig.savefig(os.path.join(output_dir, 'all_rois_loss_trajectory.pdf'), format='pd
             bbox_inches='tight', dpi=200)
 fig.savefig(os.path.join(output_dir, 'all_rois_loss_trajectory.png'),
             bbox_inches='tight', dpi=200)
-print(f"保存: {output_dir}/all_rois_loss_trajectory.pdf / .png")
+print(f"Saved: {output_dir}/all_rois_loss_trajectory.pdf / .png")
 
 print(f"\n{'=' * 60}")
 print("KEY QUESTION: Do other regions show INCREASING loss sensitivity")

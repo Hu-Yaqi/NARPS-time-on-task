@@ -1,19 +1,14 @@
 """
 36_trial_level_logistic.py
 ==========================
-Pipeline 2: Trial-Level Logistic Regression
+Trial-level logistic regression. Extracts single-trial BOLD from
+ROIs (HRF-adjusted peak +/-1 volume), then fits per-subject
+logistic models: P(reject) ~ ROI_z * trial_z + gain + loss.
+Tests whether ROI-choice relationships shift over time.
 
-Question: Does the influence of different brain regions on choice 
-shift over time? Specifically:
-- Does insula/dACC activation become MORE predictive of rejection?
-- Does vmPFC activation become LESS predictive of choice?
-
-Method: Extract trial-level BOLD (HRF-adjusted peak) from ROIs,
-then logistic regression with ROI × time interactions.
-
-运行方式：conda activate narps && python 36_trial_level_logistic.py
-预计耗时：约 30-60 分钟
-需要先安装：pip install statsmodels --break-system-packages
+Outputs:
+  - trial_logistic_results/trial_level_bold_data.csv
+  - trial_logistic_results/logistic_results.csv
 """
 
 import pandas as pd

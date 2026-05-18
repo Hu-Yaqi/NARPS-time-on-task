@@ -1,24 +1,17 @@
 """
 37_ppi_per_run.py
 =================
-Pipeline 3: Task-Modulated Connectivity, Per-Run
+Per-run context-dependent correlation between vmPFC and target ROIs.
+For each run, computes (1) overall task-period connectivity and
+(2) loss-modulated connectivity (high-loss minus low-loss correlation).
+Tests linear trends across 4 runs.
 
-Computes vmPFC-target connectivity separately for each run,
-yielding 4 time points that can be directly compared with
-the vmPFC sensitivity trajectory.
+Note: this is correlation-based, not full PPI (no HRF deconvolution).
 
-For each run, we compute two connectivity measures:
-  1. Overall: correlation between vmPFC and target across all task volumes
-  2. Loss-modulated: correlation during high-loss vs low-loss trials
-     The difference (high - low) captures "does connectivity increase
-     when loss is large?" = task-modulated connectivity
-
-Then test:
-  - Does overall connectivity change across 4 runs? (linear trend)
-  - Does loss-modulated connectivity change? (linear trend)
-
-运行方式：conda activate narps && python 37_ppi_per_run.py
-预计耗时：约 20-30 分钟（no GLM needed, just time series extraction）
+Outputs:
+  - ppi_results/per_run_connectivity.csv
+  - ppi_results/connectivity_trends.csv
+  - ppi_results/connectivity_trajectories.pdf
 """
 
 import pandas as pd
@@ -169,11 +162,11 @@ for subj in subjects:
 
 elapsed = time.time() - t0
 n_subj = len(successful)
-print(f"\n完成: {n_subj} subjects, {elapsed/60:.1f} min")
+print(f"\nDone: {n_subj} subjects, {elapsed/60:.1f} min")
 
 conn_df = pd.DataFrame(all_rows)
 conn_df.to_csv(os.path.join(output_dir, 'per_run_connectivity.csv'), index=False)
-print(f"保存: {output_dir}/per_run_connectivity.csv")
+print(f"Saved: {output_dir}/per_run_connectivity.csv")
 
 # ============================================================
 # Statistical Tests
@@ -271,7 +264,7 @@ pd.DataFrame(trend_results).to_csv(
 # Visualization
 # ============================================================
 
-print(f"\n生成可视化...")
+print(f"\nGenerating figures...")
 
 plt.rcParams.update({'font.family': 'serif', 'font.size': 10})
 
@@ -313,7 +306,7 @@ fig.savefig(os.path.join(output_dir, 'connectivity_trajectories.pdf'),
             format='pdf', bbox_inches='tight')
 fig.savefig(os.path.join(output_dir, 'connectivity_trajectories.png'),
             bbox_inches='tight', dpi=200)
-print(f"保存: {output_dir}/connectivity_trajectories.pdf / .png")
+print(f"Saved: {output_dir}/connectivity_trajectories.pdf / .png")
 
 print(f"\n{'=' * 60}")
 print("DONE")

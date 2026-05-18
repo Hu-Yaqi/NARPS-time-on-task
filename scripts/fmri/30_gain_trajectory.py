@@ -1,13 +1,13 @@
 """
 30_gain_trajectory.py
 =====================
-8-bin gain trajectory analysis, parallel to script 28's loss trajectory.
+8-bin gain + loss trajectory analysis. Extends script 28 by adding
+8 gain-bin regressors alongside the 8 loss-bin regressors, then
+extracts vmPFC values for both to visualize gain vs loss convergence.
 
-Adds 8 gain-bin regressors to the GLM (alongside the 8 loss-bin regressors),
-then extracts vmPFC values for gain to compare with loss trajectory.
-
-运行方式：conda activate narps && python 30_gain_trajectory.py
-预计耗时：约 3-4 小时（需要重跑GLM，因为design matrix变了）
+Outputs:
+  - gain_trajectory_results/trajectory_vmPFC.csv
+  - gain_trajectory_results/gain_vs_loss_vmPFC.png
 """
 
 import pandas as pd
@@ -32,7 +32,7 @@ subjects = sorted([
     d for d in os.listdir(fmriprep_base)
     if d.startswith('sub-') and os.path.isdir(os.path.join(fmriprep_base, d))
 ])
-print(f"找到 {len(subjects)} 个被试")
+print(f"Found {len(subjects)}  subjects")
 
 rois = {'vmPFC': (-12, 36, -13)}
 
@@ -91,11 +91,11 @@ successful, failed = [], []
 t0 = time.time()
 
 for subj in subjects:
-    print(f"\n{'─'*50}\n处理 {subj} ...")
+    print(f"\n{'─'*50}\nProcessing {subj} ...")
     ts = time.time()
     fdir = os.path.join(fmriprep_base, subj, 'func')
     if not os.path.exists(fdir):
-        failed.append((subj, "无fMRIPrep")); continue
+        failed.append((subj, "no fMRIPrep")); continue
 
     try:
         imgs, evts, confs = [], [], []
@@ -127,10 +127,10 @@ for subj in subjects:
             gain_traj[roi].append(gv[roi])
             loss_traj[roi].append(lv[roi])
 
-        print(f"  ✓ 完成（{time.time()-ts:.0f} 秒）")
+        print(f"  ✓ Done（{time.time()-ts:.0f} s）")
         successful.append(subj)
     except Exception as e:
-        print(f"  ✗ 失败: {e}")
+        print(f"  ✗ failed: {e}")
         failed.append((subj, str(e)))
 
 n = len(successful)
@@ -139,7 +139,6 @@ for roi in rois:
     loss_traj[roi] = np.array(loss_traj[roi])
 
 # ============================================================
-# 可视化
 # ============================================================
 
 x = np.arange(1, 9)
@@ -176,16 +175,15 @@ for roi in rois:
     ax.legend(fontsize=11)
     plt.tight_layout()
     fig.savefig(os.path.join(output_dir, f'gain_vs_loss_{roi}.png'), dpi=150)
-    print(f"保存: gain_vs_loss_{roi}.png")
+    print(f"Saved: gain_vs_loss_{roi}.png")
     plt.close()
 
-    # 保存数据
     pd.DataFrame({'bin': x, 'gain_mean': gm, 'gain_sem': gs,
                    'loss_mean': lm, 'loss_sem': ls}).to_csv(
         os.path.join(output_dir, f'trajectory_{roi}.csv'), index=False)
 
 elapsed = time.time() - t0
-print(f"\n{'='*60}\n完成！耗时: {elapsed/60:.1f} 分钟\n被试: {n}")
+print(f"\n{'='*60}\nDone！elapsed: {elapsed/60:.1f} min\nsubjects: {n}")
 for roi in rois:
     gm = np.nanmean(gain_traj[roi], axis=0)
     lm = np.nanmean(loss_traj[roi], axis=0)
