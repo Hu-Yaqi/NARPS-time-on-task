@@ -1,0 +1,19 @@
+name: narps-tot
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - seaborn
+  - nibabel
+  - nilearn>=0.13.1
+  - statsmodels
+  - scikit-learn
+  - pip
+  - pip:
+    - pymc>=5.0
+    - arviz

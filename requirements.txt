@@ -1,0 +1,11 @@
+numpy
+pandas
+scipy
+matplotlib
+seaborn
+nibabel
+nilearn>=0.13.1
+statsmodels
+scikit-learn
+pymc>=5.0
+arviz
