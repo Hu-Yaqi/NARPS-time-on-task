@@ -2,7 +2,6 @@
 
 Reanalysis of the NARPS mixed gamble fMRI dataset ([OpenNeuro ds001734](https://openneuro.org/datasets/ds001734)) examining time-on-task effects on value computation during risky decision-making.
 
-**Target venue:** CCN (Cognitive Computational Neuroscience) 2026, NYU, August 3–6
 
 ## Overview
 
