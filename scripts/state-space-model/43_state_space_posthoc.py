@@ -44,7 +44,7 @@ os.makedirs(fig_dir, exist_ok=True)
 # ============================================================
 
 print("=" * 60)
-print("Script 42: Post-hoc analyses on state-space results")
+print("Script 43: Post-hoc analyses on state-space results")
 print("=" * 60)
 
 rois_other = ['L_insula', 'R_insula', 'dACC', 'L_amygdala', 'R_IFG', 'v_striatum']

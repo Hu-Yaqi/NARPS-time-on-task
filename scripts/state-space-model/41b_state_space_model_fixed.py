@@ -65,7 +65,7 @@ bin_data_file = 'state_space_results/bin_level_data.csv'
 bin_all_file = 'state_space_results/bin_level_data_all_rois.csv'
 
 if not os.path.exists(bin_data_file):
-    print(f"ERROR: {bin_data_file} not found. Run script 41 first.")
+    print(f"ERROR: {bin_data_file} not found. Run script 34 first.")
     exit(1)
 
 bin_df = pd.read_csv(bin_data_file)
